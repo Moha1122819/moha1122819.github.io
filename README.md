@@ -6,23 +6,35 @@
 <title>Mohamed Amin TV Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body {
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
     font-family:'Roboto',sans-serif;
-    background: linear-gradient(135deg,#0a0a0a,#111111); /* dark gradient */
+    background: linear-gradient(135deg,#0d0d0d,#111111);
     color:#fff;
     padding:20px;
     scroll-behavior:smooth;
-    background-attachment:fixed;
   }
-  h1 {
+  h1{
     text-align:center;
     color:#ffd700;
     font-size:2.5em;
     margin-bottom:10px;
     text-shadow:0 0 10px #ffd700;
   }
-  #search-container {
+  #language-toggle{
+    position:absolute;
+    top:20px;
+    right:20px;
+    padding:8px 12px;
+    background:#ffd700;
+    color:#0d0d0d;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
+    box-shadow:0 0 10px #ffd700;
+  }
+  #search-container{
     text-align:center;
     margin-bottom:20px;
     position:sticky;
@@ -32,19 +44,19 @@
     z-index:100;
     border-radius:8px;
   }
-  #search-input {
+  #search-input{
     padding:10px;
     width:90%;
     max-width:500px;
     border-radius:10px;
     border:none;
     font-size:1em;
-    background:#222;
+    background:#1a1a1a;
     color:#fff;
     box-shadow:0 0 10px rgba(255,215,0,0.5);
   }
-  #sections-nav { text-align:center; margin-bottom:20px; }
-  .section-button {
+  #sections-nav{text-align:center;margin-bottom:20px;}
+  .section-button{
     background:#222;
     color:#ffd700;
     border:none;
@@ -55,17 +67,17 @@
     transition:0.3s;
     box-shadow:0 0 5px rgba(255,215,0,0.5);
   }
-  .section-button:hover { background:#ffd700; color:#0a0a0a; box-shadow:0 0 15px #ffd700; }
-  .video-container {
+  .section-button:hover{background:#ffd700;color:#0d0d0d;box-shadow:0 0 15px #ffd700;}
+  .video-container{
     display:flex;
     flex-direction:column;
     align-items:center;
     margin-bottom:40px;
-    display:none; /* hidden until channel selected */
+    display:none;
     opacity:0;
     transition:opacity 0.5s ease;
   }
-  video {
+  video{
     width:90%;
     max-width:900px;
     border:3px solid #ffd700;
@@ -73,26 +85,31 @@
     background-color:black;
     box-shadow:0 0 25px #ffd700;
   }
-  #now-playing {
+  #now-playing{
     margin-top:10px;
     font-size:1.2em;
     color:#ffd700;
     text-shadow:0 0 8px #ffd700;
   }
-  h2 {
+  h2{
     color:#ffd700;
     margin:20px 0 10px;
     border-bottom:2px solid #ffd700;
     padding-bottom:5px;
     text-shadow:0 0 5px #ffd700;
+    display:flex;
+    align-items:center;
   }
-  .section { margin-bottom:40px; }
-  .channels-grid {
+  h2 span.section-icon{
+    margin-right:10px;
+  }
+  .section{margin-bottom:40px;}
+  .channels-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
     gap:15px;
   }
-  .channel-card {
+  .channel-card{
     background-color:rgba(30,30,30,0.8);
     border:2px solid #444;
     border-radius:15px;
@@ -106,7 +123,7 @@
     position:relative;
     backdrop-filter:blur(5px);
   }
-  .channel-card span {
+  .channel-card span{
     font-size:2.5em;
     font-weight:bold;
     width:60px;
@@ -119,18 +136,20 @@
     color:#fff;
     box-shadow:0 0 10px rgba(255,215,0,0.7);
   }
-  .channel-card h3 { font-size:0.95em; color:#ffd700; margin-bottom:5px; text-align:center; text-shadow:0 0 5px #ffd700; }
-  .channel-card p { font-size:0.8em; color:#ccc; }
-  .channel-card:hover { transform:scale(1.07); border-color:#ffd700; box-shadow:0 0 20px #ffd700; }
-  .channel-card.active { border-color:#ffd700; box-shadow:0 0 25px #ffd700; }
-  #no-channels { text-align:center; color:#ccc; margin-top:10px; font-size:1em; }
-  @media(max-width:600px) { .channels-grid { grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); } }
+  .channel-card h3{ font-size:0.95em; color:#ffd700; margin-bottom:5px; text-align:center; }
+  .channel-card p{ font-size:0.8em; color:#ccc; }
+  .channel-card:hover{ transform:scale(1.07); border-color:#ffd700; box-shadow:0 0 20px #ffd700; }
+  .channel-card.active{ border-color:#ffd700; box-shadow:0 0 25px #ffd700; }
+  #no-channels{text-align:center;color:#ccc;margin-top:10px;font-size:1em;}
+  [dir="rtl"]{ direction:rtl; text-align:right; }
+  @media(max-width:600px){ .channels-grid{ grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); } }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
 
 <h1>Mohamed Amin TV Pro</h1>
+<button id="language-toggle">العربية</button>
 
 <div id="search-container">
   <input type="text" id="search-input" placeholder="Search channels...">
@@ -147,7 +166,24 @@
 <div id="no-channels" style="display:none;">No channels found</div>
 
 <script>
-const channels = [
+let lang="en";
+const translations={
+  en:{
+    search:"Search channels...",
+    nowPlaying:"Now Playing:",
+    clickToWatch:"Click to watch",
+    noChannels:"No channels found"
+  },
+  ar:{
+    search:"ابحث عن القنوات...",
+    nowPlaying:"يتم العرض:",
+    clickToWatch:"اضغط للمشاهدة",
+    noChannels:"لا توجد قنوات"
+  }
+};
+
+// Channels
+const channels=[
   {name:"Aflam 3", link:"https://shls-live-enc.edgenextcdn.net/out/v1/46079e838e65490c8299f902a7731168/index.m3u8", section:"Movies & Entertainment"},
   {name:"Aflam 2", link:"https://shls-live-enc.edgenextcdn.net/out/v1/f6d718e841f8442f8374de47f18c93a7/index.m3u8", section:"Movies & Entertainment"},
   {name:"Aflam", link:"https://shls-live-enc.edgenextcdn.net/out/v1/0044dd4b001a466c941ad77b04a574a2/index.m3u8", section:"Movies & Entertainment"},
@@ -162,7 +198,15 @@ const channels = [
   {name:"MBC 5", link:"https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8", section:"Entertainment"}
 ];
 
-const sections = ["Movies & Entertainment","News","Sports","Entertainment"];
+// Section icons
+const sectionIcons={
+  "Movies & Entertainment":"🎬",
+  "News":"📰",
+  "Sports":"⚽",
+  "Entertainment":"🎭"
+};
+
+const sections=["Movies & Entertainment","News","Sports","Entertainment"];
 const container=document.getElementById('sections-container');
 const video=document.getElementById('video');
 const videoContainer=document.getElementById('video-container');
@@ -170,12 +214,12 @@ const nowPlaying=document.getElementById('now-playing');
 const searchInput=document.getElementById('search-input');
 const sectionsNav=document.getElementById('sections-nav');
 const noChannels=document.getElementById('no-channels');
+const langToggle=document.getElementById('language-toggle');
 let activeCard=null;
 
-function getColor(letter){
-  const colors=["#ff5733","#33ff57","#3357ff","#ff33a6","#33fff2","#f2ff33"];
-  return colors[letter.charCodeAt(0)%colors.length];
-}
+function getColor(letter){ const colors=["#ff5733","#33ff57","#3357ff","#ff33a6","#33fff2","#f2ff33"]; return colors[letter.charCodeAt(0)%colors.length]; }
+
+// Section navigation buttons
 sections.forEach(sec=>{
   const btn=document.createElement('button');
   btn.className='section-button';
@@ -192,7 +236,7 @@ function renderSections(filter=""){
     sectionDiv.className='section';
     sectionDiv.id=sectionName;
     const title=document.createElement('h2');
-    title.textContent=sectionName;
+    title.innerHTML=`<span class="section-icon">${sectionIcons[sectionName]}</span>${sectionName}`;
     sectionDiv.appendChild(title);
     const grid=document.createElement('div');
     grid.className='channels-grid';
@@ -205,7 +249,7 @@ function renderSections(filter=""){
       card.className='channel-card';
       const letter=channel.name.charAt(0).toUpperCase();
       const color=getColor(letter);
-      card.innerHTML=`<span style="background:${color}">${letter}</span><h3>${channel.name}</h3><p>Click to watch</p>`;
+      card.innerHTML=`<span style="background:${color}">${letter}</span><h3>${channel.name}</h3><p>${translations[lang].clickToWatch}</p>`;
       card.onclick=()=>playStream(channel.link,channel.name,card);
       grid.appendChild(card);
     });
@@ -214,13 +258,14 @@ function renderSections(filter=""){
     container.appendChild(sectionDiv);
   });
   noChannels.style.display=anyVisible?"none":"block";
+  noChannels.textContent=translations[lang].noChannels;
 }
 
 function playStream(link,name,card){
   if(activeCard) activeCard.classList.remove('active');
   card.classList.add('active');
   activeCard=card;
-  nowPlaying.textContent=`Now Playing: ${name}`;
+  nowPlaying.textContent=`${translations[lang].nowPlaying} ${name}`;
   videoContainer.style.display='flex';
   setTimeout(()=>{ videoContainer.style.opacity=1; },50);
   if(Hls.isSupported()){
@@ -233,6 +278,15 @@ function playStream(link,name,card){
     video.play();
   } else { alert('HLS not supported in this browser'); }
 }
+
+// Language toggle
+langToggle.addEventListener('click',()=>{
+  lang=(lang==="en")?"ar":"en";
+  document.body.dir=(lang==="ar")?"rtl":"ltr";
+  searchInput.placeholder=translations[lang].search;
+  langToggle.textContent=(lang==="en")?"العربية":"English";
+  renderSections(searchInput.value);
+});
 
 searchInput.addEventListener('input',(e)=>renderSections(e.target.value));
 renderSections();
